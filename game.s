@@ -193,10 +193,19 @@ SysTick_Handler:
 
 .LelseFire:                         @ else {
 
- @ LDR     R4, =GPIOE_ODR            @   Invert LD3
+ @ LDR     R4, =GPIOE_ODR            @   
  @ LDR     R5, [R4]                  @
- @ EOR     R5, #(0b1<<(LD3_PIN))     @   GPIOE_ODR = GPIOE_ODR ^ (1<<LD3_PIN);
+ @ EOR     R5, #(0b1<<(LD3_PIN))     @   
  @ STR     R5, [R4]                  @ 
+  LDR     R4, =hasNote               @  if(hasNote) failureCount++;
+  LDR     R5, [R4]
+  CMP     R5, #0
+  BEQ     .LnoMiss
+  LDR     R4, =failureCount
+  LDR     R5, [R4]
+  ADD     R5, R5, #1
+  STR     R5, [R4]
+.LnoMiss:
   LDR     R4, =notes
   LDR     R5, =noteIndex
   LDR     R6, [R5]                  @   
@@ -213,8 +222,8 @@ SysTick_Handler:
   LDR     R5, [R4]
   BIC     R5, R5, 0x0000FF00     
   ORR     R5, R5, R6                @   set new LED status;
-
   STR     R5, [R4]
+
 
   LDR     R4, = noteIndex
   LDR     R5, [R4]
