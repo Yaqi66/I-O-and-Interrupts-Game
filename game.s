@@ -45,7 +45,7 @@ Main:
   BIC     R5, #(0b11<<(LD5_PIN*2))      @ Modify ...
   ORR     R5, #(0b01<<(LD5_PIN*2))      @ write 01 to bits 
   BIC     R5, #(0b11<<(LD6_PIN*2))      @ Modify ...
-  ORR     R5, #(0b01<<(LD6_PIN*2))      @ write 01 to bits 8
+  ORR     R5, #(0b01<<(LD6_PIN*2))      @ write 01 to bits 
   BIC     R5, #(0b11<<(LD7_PIN*2))      @ Modify ...
   ORR     R5, #(0b01<<(LD7_PIN*2))      @ write 01 to bits 
   BIC     R5, #(0b11<<(LD8_PIN*2))      @ Modify ...
@@ -86,7 +86,7 @@ Main:
                                       @     set ENABLE (bit 0) to 1
   @ initialize delayTime to be 400
   LDR     R4, =delayTime
-  LDR     R5, =#400
+  LDR     R5, =#300
   STR     R5, [R4]
   @
   @ Prepare external interrupt Line 0 (USER pushbutton)
@@ -177,7 +177,7 @@ SysTick_Handler:
   PUSH  {R4-R7, LR}
   LDR   R4, = failureCount
   LDR   R5, [R4]
-  CMP   R5, #3
+  CMP   R5, #5
   BHS   .LgameOver
   LDR   R4, = delayTime
   LDR   R6, [R4]              @delayTime in R6
@@ -330,12 +330,24 @@ delayTime:
 noteIndex:
   .space  4
 notes:
-  .byte 0b00000101, 0b00001010, 0b00010101, 0b00101010
-  .byte 0b01010100, 0b10101000, 0b01010000, 0b10100001
-  .byte 0b01000010, 0b10000101, 0b00001010, 0b00010101 
-  .byte 0b00101011, 0b01010111, 0b10101110, 0b01011100 
-  .byte 0b10111000, 0b01110000, 0b11100000, 0b11000000
-  .byte 0b10000000
+  .byte 0b00001010, 0b00010101, 0b00101010, 0b01010100 @oh jingle bells, 
+  .byte 0b10101000, 0b01010001, 0b10100010, 0b01000101 
+  .byte 0b10001010, 0b00010101, 0b00101010, 0b01010100 @jingle bells, 
+  .byte 0b10101000, 0b01010001, 0b10100010, 0b01000101 
+  .byte 0b10001010, 0b00010101, 0b00101010, 0b01010101 @Jingle all the 
+  .byte 0b10101010, 0b01010101, 0b10101010, 0b01010100 
+  .byte 0b10101000, 0b01010000, 0b10100000, 0b01000000 @way 
+  .byte 0b10000000, 0b00000001, 0b00000010, 0b00000101 
+  .byte 0b00001010, 0b00010101, 0b00101010, 0b01010101 
+  .byte 0b10101010, 0b01010101, 0b10101010, 0b01010101 
+  .byte 0b10101010, 0b01010101, 0b10101010, 0b01010101 
+  .byte 0b10101010, 0b01010101, 0b10101010, 0b01010101 
+  .byte 0b10101010, 0b01010101, 0b10101010, 0b01010101 
+  .byte 0b10101010, 0b01010101, 0b10101010, 0b01010100 
+  .byte 0b10101000, 0b01010001, 0b10100010, 0b01000100 
+  .byte 0b10001000, 0b00010001, 0b00100010, 0b01000101
+  .byte 0b10001010
+
 notesEnd:
 hasNote:
   .space  4
