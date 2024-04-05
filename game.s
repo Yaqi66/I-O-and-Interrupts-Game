@@ -151,13 +151,13 @@ Idle_Loop:
   ORR     R5, R5, 0x0000FE00
   B       .LendResult
 .Ls:
-  ORR     R5, R5, 0x0000FD00
-  B       .LendResult
-.La:
   ORR     R5, R5, 0x0000FC00
   B       .LendResult
+.La:
+  ORR     R5, R5, 0x0000F800
+  B       .LendResult
 .Lb:
-  ORR     R5, R5, 0x0000FB00
+  ORR     R5, R5, 0x0000F000
   B       .LendResult
 
 .LendResult:
@@ -174,7 +174,7 @@ End_Main:
   .type  SysTick_Handler, %function
 SysTick_Handler:
 
-  PUSH  {R4-R6, LR}
+  PUSH  {R4-R7, LR}
   LDR   R4, = failureCount
   LDR   R5, [R4]
   CMP   R5, #3
@@ -225,6 +225,10 @@ SysTick_Handler:
   B       .LendIfRestart
 .LrestartSong:
   MOV     R5, #0                    @ else index=0;
+  LDR     R6, =delayTime
+  LDR     R7, [R6]
+  SUB     R7, R7, #10
+  STR     R7, [R6]
 .LendIfRestart:
   STR     R5, [R4]
   LDR     R4, =blink_count          @   timeCount=0;
@@ -238,7 +242,7 @@ SysTick_Handler:
   STR     R5, [R4]                  @
 
   @ Return from interrupt handler
-  POP  {R4-R6, PC}
+  POP  {R4-R7, PC}
 
 
 
@@ -291,6 +295,10 @@ EXTI0_IRQHandler:
   LDR     R4, =failureCount          @ {
   LDR     R5, [R4]
   ADD     R5, R5, #1                 @  failureCount+=1;
+  STR     R5, [R4] 
+  LDR     R4, =GPIOE_ODR 
+  LDR     R5, [R4]
+  ORR     R5, 0x0000FF00
   STR     R5, [R4]                   @ }
 .LendBtnPressed:
   LDR   R4, =EXTI_PR                @ Clear (acknowledge) the interrupt
