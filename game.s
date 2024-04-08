@@ -546,7 +546,8 @@ level2SheetMusic:
 ResetForLevel2SheetMusic:
   PUSH {R4-R6, LR}
   
-  .equ    BLINK_PERIOD, 150
+
+  @.equ    BLINK_PERIOD, 150
   LDR     R4, =SCB_ICSR               @ Clear any pre-existing interrupts
   LDR     R5, =SCB_ICSR_PENDSTCLR     @
   STR     R5, [R4]                    @
@@ -558,6 +559,11 @@ ResetForLevel2SheetMusic:
   LDR     R4, =SYSTICK_LOAD           @ Set SysTick LOAD for 1ms delay
   LDR     R5, =7999                   @ Assuming 8MHz clock
   STR     R5, [R4]                    @ 
+@___________________________________________________________
+  LDR     R4, =blink_countdown
+  MOV     R5, 150
+  STR     R5, [R4]  
+@--------------------------------------------------------------
 
   LDR     R4, =SYSTICK_VAL            @   Reset SysTick internal counter to 0
   LDR     R5, =0x1                    @     by writing any value
