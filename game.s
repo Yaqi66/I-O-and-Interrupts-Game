@@ -14,7 +14,7 @@
   @ Definitions are in definitions.s to keep this file "clean"
   .include "./src/definitions.s"
 
-  .equ    BLINK_PERIOD, 300
+  @.equ    BLINK_PERIOD, 500
 
   .section .text
 
@@ -62,6 +62,7 @@ Main:
 
   LDR     R4, =blink_countdown
   LDR     R5, =BLINK_PERIOD
+  LDR     R5, [R5]
   STR     R5, [R4]  
 
 
@@ -97,6 +98,10 @@ Main:
   @
 
   @ Initialise count to zero
+  LDR   R4, =BLINK_PERIOD
+  MOV   R5, #500                      @
+  STR   R5, [R4]                      @
+
   LDR   R4, =button_count             @ count = 0;
   MOV   R5, #0                        @
   STR   R5, [R4]                      @
@@ -204,9 +209,17 @@ SysTick_Handler:
   CMP     R5, #2
   BEQ     .LReadFromSheetMusic2   
   B     .LReadFromSheetMusic1    
-.LReadFromSheetMusic2:   
+.LReadFromSheetMusic2:  
+  LDR     R4, =button_count
+  LDR     R5, [R4]
+  CMP     R5, #2
+  BLE     .LgameOverDisplay
   BL    level2SheetMusic 
-  B     .LeReadFromSheetMusic     
+  B     .LeReadFromSheetMusic  
+.LgameOverDisplay: 
+  BL    GameOverDisplay
+  B     .LeReadFromSheetMusic  
+
 .LReadFromSheetMusic1:
   BL    level1SheetMusic
 .LeReadFromSheetMusic:
@@ -218,6 +231,7 @@ SysTick_Handler:
 
   LDR     R4, =blink_countdown      @   countdown = BLINK_PERIOD;
   LDR     R5, =BLINK_PERIOD         @
+  LDR     R5, [R5]
   STR     R5, [R4]                  @
 
 .LendIfDelay:                       @ }
@@ -376,12 +390,13 @@ GameOver:
   LDR     R4, =GPIOE_ODR            @   clear LEDs;
   LDR     R5, [R4]
   BIC     R5, R5, 0x0000FF00
+  BL      GameScoreCalculation
 
   LDR     R4, =gameScore           @ show result;
   LDR     R6, [R4]
-  CMP     R6, #30                 @ change numbers here
+  CMP     R6, #8                 @ change numbers here
   BGE     .Lv
-  CMP     R6, #10
+  CMP     R6, #5
   BGE     .Ls 
   CMP     R6, #0
   BGE     .La
@@ -420,6 +435,21 @@ GameOver:
 
   POP {R4-R5, PC}
 
+@ GameOverDisplay subroutine
+@ show resulits by display LEDs
+@ Paramaters:
+@ null
+@
+@ Return:
+@ null
+GameOverDisplay:
+  PUSH {R4-R5, LR}
+  @LDR   R4, =button_count           @
+  @LDR   R5, [R4]                    @
+  @CMP   R5, #2
+  @BEQ   
+
+  POP {R4-R5, PC}
 
 @ GameScoreCalculation subroutine
 @ calculate the game score
@@ -459,7 +489,7 @@ GameScoreCalculation:
   LDR   R4, =gameScore
   STR   R6, [R4]
 
-  POP {R4-R5, PC}
+  POP {R4-R6, PC}
 
 
 @ level1SheetMusic subroutine
@@ -546,8 +576,10 @@ level2SheetMusic:
 ResetForLevel2SheetMusic:
   PUSH {R4-R6, LR}
   
+  LDR     R4, =BLINK_PERIOD
+  LDR     R5, =150
+  STR     R5, [R4]
 
-  @.equ    BLINK_PERIOD, 150
   LDR     R4, =SCB_ICSR               @ Clear any pre-existing interrupts
   LDR     R5, =SCB_ICSR_PENDSTCLR     @
   STR     R5, [R4]                    @
@@ -559,11 +591,10 @@ ResetForLevel2SheetMusic:
   LDR     R4, =SYSTICK_LOAD           @ Set SysTick LOAD for 1ms delay
   LDR     R5, =7999                   @ Assuming 8MHz clock
   STR     R5, [R4]                    @ 
-@___________________________________________________________
-  LDR     R4, =blink_countdown
-  MOV     R5, 150
-  STR     R5, [R4]  
-@--------------------------------------------------------------
+
+  LDR     R4, =SYSTICK_VAL            @   Reset SysTick internal counter to 0
+  LDR     R5, =0x1                    @     by writing any value
+  STR     R5, [R4]
 
   LDR     R4, =SYSTICK_VAL            @   Reset SysTick internal counter to 0
   LDR     R5, =0x1                    @     by writing any value
@@ -602,6 +633,9 @@ ResetForLevel2SheetMusic:
 
   POP {R4-R6, PC}
   .section .data
+
+BLINK_PERIOD:
+  .space  4
   
 button_count:
   .space  4
@@ -749,6 +783,9 @@ sheetMusicSecondLevel:
 
 .byte 0b10101000, 0b01010001, 0b10100010, 0b01000101
 .byte 0b10101000, 0b01010001, 0b10100010, 0b01000101
+
+.byte 0b00000001, 0b00000010, 0b00000100, 0b00001000 @
+.byte 0b00000100, 0b00000010, 0b00000001, 0b00000001 @
 
 .byte 0b10101010, 0b01010101, 0b10101010, 0b01010100
 .byte 0b10101000, 0b01010000, 0b10100000, 0b01000000
