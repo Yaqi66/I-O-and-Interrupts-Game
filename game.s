@@ -146,8 +146,8 @@ Main:
   ORR     R5, R5, #1
   STR     R5, [R4]
 
-  @ Set falling edge detection on Line0
-  LDR     R4, =EXTI_FTSR
+  @ Set rising edge detection on Line0
+  LDR     R4, =EXTI_RTSR
   LDR     R5, [R4]
   ORR     R5, R5, #1
   STR     R5, [R4]
@@ -394,11 +394,11 @@ GameOver:
 
   LDR     R4, =gameScore           @ show result;
   LDR     R6, [R4]
-  CMP     R6, #8                 @ change numbers here
+  CMP     R6, #28                 @ change numbers here
   BGE     .Lv
-  CMP     R6, #5
+  CMP     R6, #15
   BGE     .Ls 
-  CMP     R6, #0
+  CMP     R6, #9
   BGE     .La
   B       .Lb
 
@@ -421,10 +421,10 @@ GameOver:
   ORR     R5, R5, 0x0000FE00
   B       .LendResult
 .La:
-  ORR     R5, R5, 0x0000FC00
+  ORR     R5, R5, 0x0000F800
   B       .LendResult
 .Lb:
-  ORR     R5, R5, 0x0000F800
+  ORR     R5, R5, 0x0000E000
   B       .LendResult
 
 .LendResult:
