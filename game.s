@@ -99,7 +99,7 @@ Main:
 
   @ Initialise count to zero
   LDR   R4, =BLINK_PERIOD
-  MOV   R5, #500                      @
+  MOV   R5, #300                      @
   STR   R5, [R4]                      @
 
   LDR   R4, =button_count             @ count = 0;
@@ -355,7 +355,7 @@ JudgementLevels:
 
   BL    isInJudgmentPhase
   LDR R4, =isJudgmentPhase          @ if(isJudgmentPhase)
-  LDR R5, [R4]
+  LDR R5, [R4]                      @
   CMP R5, #1
   BEQ   .LisSuccessfulHit
   B     .LmissedHit
@@ -502,6 +502,7 @@ GameScoreCalculation:
 level1SheetMusic:
   PUSH {R4-R6, LR}
 
+  @LDR     R4, = blank
   LDR     R4, = sheetMusicReadAddress
   LDR     R5, [R4]
   LDR     R6, [R5]
@@ -511,9 +512,11 @@ level1SheetMusic:
   STR     R5, [R4]
   B       .LememoryRead
 .Lreset:
-  LDR   R5, = sheetMusic
+  LDR   R5, = blank
+  @LDR   R5, = sheetMusic
   @LDR   R5, = sheetMusicSecondLevel
   STR   R5, [R4]
+  BL    GameOver
 .LememoryRead:
 
   LDR     R4, = sheetMusicReadAddress
@@ -548,9 +551,11 @@ level2SheetMusic:
   STR     R5, [R4]
   B       .LememoryReadLevel2
 .LresetLevel2:
+  LDR    R5, = blank
   @LDR   R5, = sheetMusic
-  LDR   R5, = sheetMusicSecondLevel
-  STR   R5, [R4]
+  @LDR   R5, = sheetMusicSecondLevel
+  STR    R5, [R4]
+  BL    GameOver
 .LememoryReadLevel2:
 
   LDR     R4, = sheetMusicReadAddress
@@ -764,7 +769,7 @@ sheetMusic:
 .byte 0b10100000, 0b01000000, 0b10000000, 0b00000000
 
 blank:
-  .space  4
+  .byte 0b00000000, 0b00000000, 0b00000000, 0b00000000
 
 nextLevelIndicator:
   .space  4
